@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO APP</title>
+</head>
+<body>
+    <h1>Todo APP</h1>
+    <!-- <form > -->
+        <label for="title">Title</label>
+        <input type="text " id="title" placeholder="Enter the Title Here">
+        <label for="description">Description</label>
+        <input type="text"  id="description" placeholder="Description Here..">
+        <button type="submit" onclick="todoHandller()">Send</button>
+        <!-- <button onclick="displayData()">Get the todo</button> -->
+        <div id="display">
+
+        </div>
+    <!-- </form> -->
+
+    <script>
+        const titleTodo = document.getElementById("title");
+        const desTodo = document.getElementById("description");
+        const displayElement = document.getElementById("display")
+        function removeTodo(id)
+        {
+            console.log(id)
+            
+        }
+        const displayData =()=>{
+            fetch("http://localhost:3000/todos",{
+                method:"GET"
+            }).then((response)=>{
+                response.json().then((data)=>{
+                    console.log(data);
+                    displayElement.innerText = "";
+                    // displayElement.innerText = JSON.stringify(data)
+                     data.forEach(element => {
+                        // displayElement.innerText+= `${element.title}\t:${element.description}\n`;
+                        console.log(element.id)
+                        let childDivs = document.createElement("div"); 
+                        childDivs.setAttribute("id",element.id)
+                        var childSpan1= document.createElement("span");
+                        childSpan1.innerHTML = element.title 
+                        var childSpan2 = document.createElement("span");
+                        childSpan2.innerHTML = element.description 
+                        var button = document.createElement("button");
+                        button.setAttribute("onclick","deleteTodo("+element.id+")");
+                        button.innerHTML="Delete";
+                        childDivs.appendChild(childSpan1);
+                        childDivs.appendChild(childSpan2);
+                        childDivs.appendChild(button);
+                        displayElement.appendChild(childDivs);
+                    });
+                    
+                   
+                })
+            });
+        }
+        displayData();
+        function deleteTodo(id) {
+            console.log(id)
+        fetch("http://localhost:3000/todos/" +id, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        }).then((response)=>response.json()).then((data)=>{
+            console.log("delete"+data.id)
+            const todoToRemove = document.getElementById(data.id);
+            console.log(todoToRemove);
+            displayElement.removeChild(todoToRemove)})
+    }
+        const todoHandller = ()=>{
+            // e.preventDefault();
+            fetch("http://localhost:3000/todos",{
+                method:"POST",
+                body:JSON.stringify({
+                    title:titleTodo.value,
+                    description:desTodo.value
+                }),
+                headers:{
+                    "Content-Type":"application/json"
+                }
+            }).then((response)=>response.json()).then((data)=>{
+                let childDivs = document.createElement("div"); 
+                        childDivs.setAttribute("id",data.id)
+                        var childSpan1= document.createElement("span");
+                        childSpan1.innerHTML = data.title 
+                        var childSpan2 = document.createElement("span");
+                        childSpan2.innerHTML = data.description 
+                        var button = document.createElement("button");
+                        button.setAttribute("onclick","deleteTodo("+data.id+")");
+                        button.innerHTML="Delete";
+                        childDivs.appendChild(childSpan1);
+                        childDivs.appendChild(childSpan2);
+                        childDivs.appendChild(button);
+                        displayElement.appendChild(childDivs);
+                        console.log(childDivs)
+            })
+        }
+    </script>
+</body>
+</html>
